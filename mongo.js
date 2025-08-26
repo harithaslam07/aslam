@@ -105,23 +105,7 @@ app.delete('/deletebyroll', async (req, res) => {
     }
 })
 
-app.delete('/deletebyroll', async (req, res) => {
-    const { rollno } = req.body
-    try {
-        const { rollno } = req.body
 
-        const data = await Student.deleteOne({ rollno });//it return the count
-        if (data.deletedCount > 0) {
-            res.send("delete successfully")
-        }
-        else {
-            res.status(404).send("not found")
-        }
-    }
-    catch {
-        res.status(500).send("error")
-    }
-})
 
 app.delete('/deletebyrollno', async (req, res) => {
     const { rollno } = req.body
