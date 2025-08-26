@@ -143,6 +143,29 @@ app.delete('/deletebyrollno', async (req, res) => {
     }
 })
 
+app.delete('/updatestudent', async (req, res) => {
+    const { rollno, name, age, department } = req.body
+    try {
+
+
+        const data = await Student.findOneAndUpdate(
+            { rollno },
+            { name, age, department },
+            { new: true }
+        );
+        if (data) {
+
+            res.send("student updated")
+
+        }
+        else {
+            res.status(404).send("not found")
+        }
+    }
+    catch {
+        res.status(500).send("error")
+    }
+})
 app.listen(3003)
 
 
