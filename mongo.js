@@ -52,40 +52,8 @@ app.get('/getstdbyroll', async (req, res) => {
         res.status(500).send("error")
     }
 })
-app.get('/getstdbyroll', async (req, res) => {
-    const { rollno } = req.body
-    try {
-        const { rollno } = req.body
 
-        const data = await Student.findOne({ rollno });
-        if (data) {
-            res.send(data)
-        }
-        else {
-            res.status(404).send("not found")
-        }
-    }
-    catch {
-        res.status(500).send("error")
-    }
-})
-app.get('/getstdbyroll', async (req, res) => {
-    const { rollno } = req.body
-    try {
-        const { rollno } = req.body
 
-        const data = await Student.findOne({ rollno });
-        if (data) {
-            res.send(data)
-        }
-        else {
-            res.status(404).send("not found")
-        }
-    }
-    catch {
-        res.status(500).send("error")
-    }
-})
 
 app.delete('/deletebyroll', async (req, res) => {
     const { rollno } = req.body
