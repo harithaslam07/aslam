@@ -1,5 +1,6 @@
 const express = require("express")
 const mongoose = require("mongoose")
+const jwt = require('jsonwebtoken')
 const app = express()
 
 app.use(express.json())
@@ -14,19 +15,62 @@ const studentschema = new mongoose.Schema({
     rollno: String
 })
 
-
 const Student = mongoose.model("student", studentschema)
-app.post('/insert', async (req, res) => {
-    const { name, age, department, rollno } = req.body
-    const newStudent = new Student({ name, age, department, rollno });
-    try {
-        await newStudent.save();
-        res.status(201).send("Student inserted")
-    } catch (error) {
-        res.status(400).send("error")
+
+
+app.post('/insert', verifytoken, insertdata)
+app.get('/getallstd', verifytoken, getdata)
+app.get('/getstdbyroll', verifytoken, getroll)
+app.delete('/deletebyroll', verifytoken, deleteroll)
+app.delete('/deletebyrollno', verifytoken, deleteby)
+app.put('/updatestudent', verifytoken, updatval)
+
+
+app.post('/login', (req, res) => {
+    let { username, password } = req.body
+    if (username == "aslam" && password == "999") {
+        let token = jwt.sign({ username }, "SECRETKEY", {
+            expiresIn: '1h'
+        })
+        res.send(token);
     }
 })
-app.get('/getallstd', async (req, res) => {
+
+function verifytoken(req, res, next) {
+    let token = req.body.token
+    if (!token) return res.send("no token provided")
+    jwt.verify(token, "SECRETKEY", (err, decoded) => {
+        if (err) {
+
+            return res.send("invalid token");
+        }
+        console.log(decoded)
+        next()
+    })
+
+
+}
+
+async function insertdata(req, res) {
+    const dup = await Student.findOne({ rollno: req.body.rollno })
+    if (!dup) {
+        const newStudent = new Student(req.body)
+
+
+        try {
+            await newStudent.save();
+            res.status(201).send("Student inserted")
+        } catch (error) {
+            res.status(400).send("error")
+        }
+    }
+    else {
+        res.send("duplicate")
+    }
+}
+
+
+async function getdata(req, res) {
     try {
         const data = await Student.find();
         res.send(data)
@@ -34,8 +78,8 @@ app.get('/getallstd', async (req, res) => {
     catch {
         res.status(500).send("error")
     }
-})
-app.get('/getstdbyroll', async (req, res) => {
+}
+async function getroll(req, res) {
     const { rollno } = req.body
     try {
         const { rollno } = req.body
@@ -51,11 +95,12 @@ app.get('/getstdbyroll', async (req, res) => {
     catch {
         res.status(500).send("error")
     }
-})
+}
 
 
 
-app.delete('/deletebyroll', async (req, res) => {
+
+async function deleteroll(req, res) {
     const { rollno } = req.body
     try {
         const { rollno } = req.body
@@ -71,11 +116,11 @@ app.delete('/deletebyroll', async (req, res) => {
     catch {
         res.status(500).send("error")
     }
-})
+}
 
 
 
-app.delete('/deletebyrollno', async (req, res) => {
+async function deleteby(req, res) {
     const { rollno } = req.body
     try {
         const { rollno } = req.body
@@ -93,9 +138,10 @@ app.delete('/deletebyrollno', async (req, res) => {
     catch {
         res.status(500).send("error")
     }
-})
+}
 
-app.delete('/updatestudent', async (req, res) => {
+
+async function updatval(req, res) {
     const { rollno, name, age, department } = req.body
     try {
 
@@ -117,7 +163,7 @@ app.delete('/updatestudent', async (req, res) => {
     catch {
         res.status(500).send("error")
     }
-})
+}
 app.listen(3003)
 
 
