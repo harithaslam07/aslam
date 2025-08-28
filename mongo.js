@@ -2,12 +2,11 @@ const express = require("express")
 const mongoose = require("mongoose")
 const jwt = require('jsonwebtoken')
 const app = express()
+const db=require('./db')
 
 app.use(express.json())
 
-mongoose.connect("mongodb://127.0.0.1:27017/studentdata")
-    .then(() => console.log("MONGO DB connected"))
-    .catch(err => console.log(" DB connection error", err))
+db()
 const studentschema = new mongoose.Schema({
     name: String,
     age: Number,
@@ -17,8 +16,8 @@ const studentschema = new mongoose.Schema({
 
 const Student = mongoose.model("student", studentschema)
 
-
-app.post('/insert', verifytoken, insertdata)
+app.post('/login',loginn)
+app.post('/insert', insertdata)
 app.get('/getallstd', verifytoken, getdata)
 app.get('/getstdbyroll', verifytoken, getroll)
 app.delete('/deletebyroll', verifytoken, deleteroll)
@@ -26,7 +25,8 @@ app.delete('/deletebyrollno', verifytoken, deleteby)
 app.put('/updatestudent', verifytoken, updatval)
 
 
-app.post('/login', (req, res) => {
+
+async function loginn (req, res) {
     let { username, password } = req.body
     if (username == "aslam" && password == "999") {
         let token = jwt.sign({ username }, "SECRETKEY", {
@@ -34,7 +34,7 @@ app.post('/login', (req, res) => {
         })
         res.send(token);
     }
-})
+}
 
 function verifytoken(req, res, next) {
     let token = req.body.token
@@ -164,9 +164,5 @@ async function updatval(req, res) {
         res.status(500).send("error")
     }
 }
-app.listen(3003)
-
-
-
-
-
+    
+app.listen(3003);
